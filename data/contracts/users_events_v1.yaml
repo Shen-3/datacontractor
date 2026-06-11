@@ -1,0 +1,71 @@
+name: users_events
+version: 1.0.0
+description: User activity events used by analytics team
+owner: user-platform-team
+consumers:
+  - analytics-team
+  - marketing-bi
+  - churn-model-team
+
+schema:
+  fields:
+    - name: user_id
+      type: integer
+      required: true
+      nullable: false
+      description: Unique user identifier
+
+    - name: event_type
+      type: enum
+      required: true
+      nullable: false
+      values:
+        - login
+        - logout
+        - purchase
+      description: Type of user event
+
+    - name: event_time
+      type: timestamp
+      required: true
+      nullable: false
+      description: Event timestamp in UTC
+
+    - name: amount
+      type: decimal
+      required: false
+      nullable: true
+      description: Purchase amount if event_type is purchase
+
+quality_rules:
+  - name: user_id_not_null
+    type: not_null
+    field: user_id
+    severity: critical
+
+  - name: event_type_allowed
+    type: allowed_values
+    field: event_type
+    values:
+      - login
+      - logout
+      - purchase
+    severity: error
+
+  - name: event_time_freshness
+    type: freshness
+    field: event_time
+    max_delay_minutes: 1440
+    severity: warning
+
+  - name: event_type_unique
+    type: unique
+    field: user_id
+    severity: warning
+
+sla:
+  update_frequency: daily
+  max_delay_minutes: 1440
+
+compatibility:
+  mode: backward

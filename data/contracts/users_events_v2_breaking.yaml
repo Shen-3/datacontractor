@@ -1,0 +1,55 @@
+name: users_events
+version: 2.0.0
+description: User activity events - breaking changes
+owner: user-platform-team
+consumers:
+  - analytics-team
+  - marketing-bi
+
+schema:
+  fields:
+    - name: client_id
+      type: integer
+      required: true
+      nullable: false
+      description: Unique client identifier (renamed from user_id)
+
+    - name: event_type
+      type: enum
+      required: true
+      nullable: false
+      values:
+        - login
+        - logout
+        - purchase
+        - signup
+      description: Type of user event
+
+    - name: event_time
+      type: timestamp
+      required: true
+      nullable: false
+      description: Event timestamp in UTC
+
+quality_rules:
+  - name: client_id_not_null
+    type: not_null
+    field: client_id
+    severity: critical
+
+  - name: event_type_allowed
+    type: allowed_values
+    field: event_type
+    values:
+      - login
+      - logout
+      - purchase
+      - signup
+    severity: error
+
+sla:
+  update_frequency: daily
+  max_delay_minutes: 1440
+
+compatibility:
+  mode: backward
