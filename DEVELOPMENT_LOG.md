@@ -18,10 +18,6 @@ Date: 2025-01-01
 - Added DEVELOPMENT_LOG.md
 - Added PROJECT_AGENT_PROMPT.md
 
-### Commands executed
-```bash
-gh repo create datacontractor --public --description "Data contracts and data quality service for ETL pipelines" --source=. --remote=origin --push
-```
 
 ### Commit
 `chore: initialize project structure`
