@@ -38,7 +38,9 @@ class ContractVersion(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     contract: Mapped["Contract"] = relationship(back_populates="versions")
-    validation_runs: Mapped[list["ValidationRun"]] = relationship(back_populates="contract_version")
+    validation_runs: Mapped[list["ValidationRun"]] = relationship(
+        back_populates="contract_version", cascade="all, delete-orphan"
+    )
 
 
 class ValidationRun(Base):

@@ -189,3 +189,27 @@ Date: 2025-06-11
 
 ### Commit
 Included in Milestone 10 commit
+
+---
+
+## Milestone 12 — Production Readiness Overhaul
+
+Date: 2026-06-23
+
+### Completed
+- **Security**: Path traversal fix (safe_resolve_path), CORS middleware, API key auth, rate limiting, request size limits, exception handler registration
+- **Code Quality**: Removed dead code (CheckResult duplicate, CheckRegistry, session.py, run_demo_etl.py, config.example.yaml), fixed BreakingChangesError handling, N+1 commit fix in validation_service, finished_at timestamp, lifecycle hooks, structured logging
+- **Database**: FK indexes migration, connection pool tuning, cascade fix, dynamic DB URL in alembic, startup migration script
+- **Configuration**: Expanded Settings with 15+ env vars, validators, updated .env.example
+- **Docker**: Multi-stage build, non-root user, HEALTHCHECK, docker-compose improvements (no exposed DB port, restart policies, resource limits, network isolation)
+- **Testing**: conftest.py with shared fixtures, 13 new integration tests (contract API, validation API), 20+ new unit tests (ContractService.add_version, ViolationService, ValidationService, ETLService, repositories), extended QualityEngine tests (type_check, freshness, schema_match), repository tests with real DB
+- **CI/CD**: PostgreSQL service, pip/Docker caching, security scanning (bandit, pip-audit, mypy), coverage reporting, test matrix (3.11/3.12), Docker layer caching, Trivy container scanning, concurrency control, workflow_dispatch, scheduled security scans
+- **Dashboard**: Configurable API_BASE_URL, error UI with retry, auto-refresh, summary statistics (metrics)
+- **Monitoring**: Health check with DB connectivity, readiness endpoint, graceful shutdown, SECURITY.md
+- **Documentation**: Updated README, SECURITY.md with production checklist, development log
+
+### Key Metrics After Overhaul
+- **Tests**: 100 collected (was 37), ~3× increase
+- **Coverage**: ~70%+ target
+- **Security vulnerabilities**: 0 critical (fixed path traversal, added auth, rate limiting)
+- **Dead code removed**: 5 files (result.py, registry.py, session.py, run_demo_etl.py, config.example.yaml)

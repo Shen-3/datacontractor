@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 import pandas as pd
 
@@ -23,6 +23,7 @@ class CheckResult:
         self.failed_rows_count = failed_rows_count
         self.sample_records = sample_records or []
         self.message = message
+        self.timestamp = datetime.now(timezone.utc)
 
     def to_dict(self) -> dict:
         return {
@@ -34,6 +35,7 @@ class CheckResult:
             "failed_rows_count": self.failed_rows_count,
             "sample_records": self.sample_records[:10],
             "message": self.message,
+            "timestamp": self.timestamp.isoformat(),
         }
 
 
@@ -146,7 +148,6 @@ class QualityEngine:
         )
 
     def _check_regex(self, df: pd.DataFrame, rule: dict) -> CheckResult:
-        import re
 
         field = rule["field"]
         pattern = rule.get("pattern", "")
@@ -276,7 +277,9 @@ class QualityEngine:
             passed=failed_count == 0,
             severity=rule.get("severity", "error"),
             failed_rows_count=failed_count,
-            message=f"Field '{field}' has {failed_count} values not matching type '{expected_type}'" if failed_count > 0 else "",
+            message=f"Field '{field}' has {failed_count} values not matching type '{expected_type}'"
+            if failed_count > 0
+            else "",
         )
 
     def _check_row_count_min(self, df: pd.DataFrame, rule: dict) -> CheckResult:

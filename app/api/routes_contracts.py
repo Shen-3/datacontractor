@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from app.core.errors import BreakingChangesError
 from app.db.base import get_db
 from app.schemas.contract import (
     ContractCreate,
@@ -75,8 +76,8 @@ def add_version(contract_name: str, data: VersionCreate, db: Session = Depends(g
     service = ContractService(db)
     try:
         version = service.add_version(contract_name, data)
+    except BreakingChangesError as e:
+        raise HTTPException(status_code=409, detail=e.detail)
     except ValueError as e:
-        detail = e.args[0] if isinstance(e.args[0], dict) else str(e)
-        status = 409 if isinstance(detail, dict) else 400
-        raise HTTPException(status_code=status, detail=detail)
+        raise HTTPException(status_code=400, detail=str(e))
     return version

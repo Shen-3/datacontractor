@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.db.base import get_db
-from app.db.repositories import ValidationRunRepository
 from app.schemas.violation import ViolationResponse, ViolationStatusUpdate
 from app.services.violation_service import ViolationService
 

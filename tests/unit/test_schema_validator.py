@@ -22,7 +22,13 @@ class TestSchemaValidator:
         schema = {
             "fields": [
                 {"name": "user_id", "type": "integer", "required": True, "nullable": False},
-                {"name": "event_type", "type": "enum", "required": True, "nullable": False, "values": ["login", "purchase", "logout"]},
+                {
+                    "name": "event_type",
+                    "type": "enum",
+                    "required": True,
+                    "nullable": False,
+                    "values": ["login", "purchase", "logout"],
+                },
                 {"name": "event_time", "type": "timestamp", "required": True, "nullable": False},
                 {"name": "amount", "type": "decimal", "required": False, "nullable": True},
             ]
@@ -40,7 +46,12 @@ class TestSchemaValidator:
 
     def test_missing_optional_field(self, validator):
         df = pd.DataFrame({"user_id": [1]})
-        schema = {"fields": [{"name": "user_id", "type": "integer", "required": True}, {"name": "extra", "type": "string", "required": False}]}
+        schema = {
+            "fields": [
+                {"name": "user_id", "type": "integer", "required": True},
+                {"name": "extra", "type": "string", "required": False},
+            ]
+        }
         result = validator.validate(df, schema)
         assert result["valid"] is True
         assert len(result["warnings"]) > 0

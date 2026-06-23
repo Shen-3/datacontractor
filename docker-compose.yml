@@ -1,14 +1,11 @@
-version: "3.9"
-
 services:
   postgres:
     image: postgres:16
+    restart: unless-stopped
     environment:
       POSTGRES_USER: datacontractor
       POSTGRES_PASSWORD: datacontractor
       POSTGRES_DB: datacontractor
-    ports:
-      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -16,31 +13,64 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
 
   api:
     build: .
+    restart: unless-stopped
     ports:
       - "8000:8000"
     environment:
       DATABASE_URL: postgresql://datacontractor:datacontractor@postgres:5432/datacontractor
+      API_BASE_URL: http://api:8000
+    env_file:
+      - .env
     depends_on:
       postgres:
         condition: service_healthy
     volumes:
       - ./data:/app/data
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
 
   dashboard:
     build: .
+    restart: unless-stopped
     command: streamlit run app/dashboard/streamlit_app.py --server.port 8501 --server.address 0.0.0.0
     ports:
       - "8501:8501"
     environment:
       DATABASE_URL: postgresql://datacontractor:datacontractor@postgres:5432/datacontractor
+      API_BASE_URL: http://api:8000
+    env_file:
+      - .env
     depends_on:
       postgres:
         condition: service_healthy
     volumes:
       - ./data:/app/data
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
 
 volumes:
   pgdata:
+
+networks:
+  backend:
+    driver: bridge

@@ -2,6 +2,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
+from app.core.errors import BreakingChangesError
 from app.db.repositories import ContractRepository, ContractVersionRepository
 from app.schemas.contract import ContractCreate, VersionCreate
 
@@ -68,7 +69,7 @@ class ContractService:
             new_schema = data.schema.model_dump()
             result = checker.check(old_schema, new_schema)
             if not result["compatible"]:
-                raise ValueError(
+                raise BreakingChangesError(
                     {
                         "error": "breaking_changes_detected",
                         "compatible": result["compatible"],

@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from sqlalchemy.orm import Session
 
 from app.db.models import Contract, ContractVersion, ValidationRun, Violation
@@ -50,7 +52,10 @@ class ContractVersionRepository:
     def get_active_version(self, contract_id) -> ContractVersion | None:
         return (
             self.db.query(ContractVersion)
-            .filter(ContractVersion.contract_id == contract_id, ContractVersion.is_active == True)
+            .filter(
+                ContractVersion.contract_id == contract_id,
+                ContractVersion.is_active.is_(True),
+            )
             .first()
         )
 
@@ -98,6 +103,7 @@ class ValidationRunRepository:
             vr.status = status
             vr.rows_checked = rows_checked
             vr.violations_count = violations_count
+            vr.finished_at = datetime.now(timezone.utc)
             self.db.commit()
 
     def get_by_id(self, run_id) -> ValidationRun | None:
@@ -152,3 +158,19 @@ class ViolationRepository:
         if v:
             v.status = status
             self.db.commit()
+
+    def bulk_create(self, violation_records: list[dict]) -> list[Violation]:
+        """Create multiple violations in a single database transaction.
+
+        Args:
+            violation_records: List of violation dicts matching model fields.
+
+        Returns:
+            List of created Violation ORM instances.
+        """
+        violations = [Violation(**record) for record in violation_records]
+        self.db.add_all(violations)
+        self.db.commit()
+        for v in violations:
+            self.db.refresh(v)
+        return violations
